@@ -1,0 +1,12 @@
+{
+  "buildCommand": "bun run postinstall && bun run build",
+  "devCommand": "bun run dev",
+  "installCommand": "bun install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "functions": {
+    "app/**": {
+      "maxDuration": 30
+    }
+  }
+}
