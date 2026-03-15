@@ -12,6 +12,17 @@ const nextConfig: NextConfig = {
     "127.0.0.1",
     ".space.z.ai",
     "space.z.ai",
+    ".z.ai",
+  ],
+  // Allow cross-origin for static chunks in dev
+  headers: async () => [
+    {
+      source: "/_next/:path*",
+      headers: [
+        { key: "Access-Control-Allow-Origin", value: "*" },
+        { key: "Access-Control-Allow-Methods", value: "GET, OPTIONS" },
+      ],
+    },
   ],
 };
 
