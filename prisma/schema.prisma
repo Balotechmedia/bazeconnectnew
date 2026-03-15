@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // ==================== USER & AUTH ====================
@@ -61,9 +62,9 @@ model Profile {
   coverPhoto  String?
   department  String?
   faculty     String?
-  level       Int?     // 100-500
+  level       Int?
   bio         String?
-  interests   String?  // Comma-separated interests
+  interests   String?
   phone       String?
   website     String?
   createdAt   DateTime @default(now())
@@ -102,25 +103,25 @@ model Post {
   id          String    @id @default(cuid())
   authorId    String
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  groupId     String?   // Null for personal posts
+  groupId     String?
   group       Group?    @relation(fields: [groupId], references: [id], onDelete: Cascade)
   
   content     String
   postType    PostType  @default(TEXT)
-  mediaUrl    String?   // For images
-  documentUrl String?   // For PDFs
-  linkUrl     String?   // For links
+  mediaUrl    String?
+  documentUrl String?
+  linkUrl     String?
   linkTitle   String?
   linkDescription String?
   
-  likesCount  Int       @default(0)
-  commentsCount Int     @default(0)
+  likesCount    Int @default(0)
+  commentsCount Int @default(0)
   
-  isPinned    Boolean   @default(false)
-  isReported  Boolean   @default(false)
+  isPinned    Boolean @default(false)
+  isReported  Boolean @default(false)
   
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   comments    Comment[]
@@ -139,12 +140,12 @@ model Comment {
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   
-  parentId  String?  // For nested replies
+  parentId  String?
   parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies   Comment[] @relation("CommentReplies")
   
   content   String
-  likesCount Int    @default(0)
+  likesCount Int @default(0)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -187,7 +188,7 @@ model Message {
   receiver    User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   
   content     String
-  mediaUrl    String?  // For image messages
+  mediaUrl    String?
   isRead      Boolean  @default(false)
   readAt      DateTime?
   
@@ -216,10 +217,10 @@ model Group {
   coverPhoto  String?
   visibility  GroupVisibility @default(PUBLIC)
   
-  membersCount Int            @default(0)
+  membersCount Int @default(0)
   
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   members     GroupMember[]
@@ -256,7 +257,7 @@ model Event {
   id          String   @id @default(cuid())
   creatorId   String
   creator     User     @relation("EventCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  groupId     String?  // Optional: if event is by a group
+  groupId     String?
   
   title       String
   description String?
@@ -266,9 +267,9 @@ model Event {
   eventTime   String?
   endDate     DateTime?
   
-  isPublic    Boolean  @default(true)
+  isPublic    Boolean @default(true)
   capacity    Int?
-  attendeesCount Int  @default(0)
+  attendeesCount Int @default(0)
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -328,16 +329,16 @@ model MarketplaceListing {
   description String?
   price       Float
   category    ListingCategory @default(OTHER)
-  images      String?         // Comma-separated URLs
-  condition   String?         // New, Like New, Used, etc.
+  images      String?
+  condition   String?
   location    String?
   contactInfo String?
   
-  status      ListingStatus   @default(ACTIVE)
-  viewsCount  Int             @default(0)
+  status      ListingStatus @default(ACTIVE)
+  viewsCount  Int @default(0)
   
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([sellerId])
   @@index([category])
@@ -366,12 +367,12 @@ model Notification {
   type        NotificationType
   title       String
   message     String
-  data        String?          // JSON string for additional data
+  data        String?
   
-  isRead      Boolean          @default(false)
+  isRead      Boolean @default(false)
   readAt      DateTime?
   
-  createdAt   DateTime         @default(now())
+  createdAt   DateTime @default(now())
 
   @@index([userId])
   @@index([isRead])
@@ -401,7 +402,7 @@ model Report {
   reporter    User         @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
   
   reportedUserId String?
-  reportedUser  User?      @relation("ReportReported", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reportedUser   User?      @relation("ReportReported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   
   postId      String?
   post        Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
