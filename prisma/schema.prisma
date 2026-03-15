@@ -1,5 +1,5 @@
 // BazeConnect - University Social Media Platform
-// Complete Prisma Schema for all modules
+// Prisma Schema for Vercel Deployment
 
 generator client {
   provider = "prisma-client-js"
@@ -30,7 +30,6 @@ model User {
   updatedAt     DateTime  @updatedAt
   lastActive    DateTime  @default(now())
 
-  // Relations
   profile       Profile?
   posts         Post[]
   comments      Comment[]
@@ -41,7 +40,7 @@ model User {
   receivedMessages Message[] @relation("MessageReceiver")
   groupMemberships GroupMember[]
   createdGroups Group[]   @relation("GroupCreator")
-  events        Event[]   @relation("EventCreator")
+  createdEvents Event[]   @relation("EventCreator")
   eventRsvps    EventRsvp[]
   listings      MarketplaceListing[]
   notifications Notification[]
@@ -100,36 +99,33 @@ enum PostType {
 }
 
 model Post {
-  id          String    @id @default(cuid())
-  authorId    String
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  groupId     String?
-  group       Group?    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  authorId       String
+  author         User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  groupId        String?
   
-  content     String
-  postType    PostType  @default(TEXT)
-  mediaUrl    String?
-  documentUrl String?
-  linkUrl     String?
-  linkTitle   String?
+  content        String
+  postType       PostType  @default(TEXT)
+  mediaUrl       String?
+  documentUrl    String?
+  linkUrl        String?
+  linkTitle      String?
   linkDescription String?
   
-  likesCount    Int @default(0)
-  commentsCount Int @default(0)
+  likesCount     Int       @default(0)
+  commentsCount  Int       @default(0)
   
-  isPinned    Boolean @default(false)
-  isReported  Boolean @default(false)
+  isPinned       Boolean   @default(false)
+  isReported     Boolean   @default(false)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  // Relations
-  comments    Comment[]
-  likes       Like[]
-  reports     Report[]
+  comments       Comment[]
+  likes          Like[]
+  reports        Report[]
 
   @@index([authorId])
-  @@index([groupId])
   @@index([createdAt])
 }
 
@@ -145,12 +141,11 @@ model Comment {
   replies   Comment[] @relation("CommentReplies")
   
   content   String
-  likesCount Int @default(0)
+  likesCount Int    @default(0)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
   likes     Like[]
 
   @@index([postId])
@@ -208,23 +203,21 @@ enum GroupVisibility {
 }
 
 model Group {
-  id          String          @id @default(cuid())
-  creatorId   String
-  creator     User            @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  id           String          @id @default(cuid())
+  creatorId    String
+  creator      User            @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   
-  name        String
-  description String?
-  coverPhoto  String?
-  visibility  GroupVisibility @default(PUBLIC)
+  name         String
+  description  String?
+  coverPhoto   String?
+  visibility   GroupVisibility @default(PUBLIC)
   
-  membersCount Int @default(0)
+  membersCount Int             @default(0)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
-  // Relations
-  members     GroupMember[]
-  posts       Post[]
+  members      GroupMember[]
 
   @@index([creatorId])
   @@index([visibility])
@@ -254,28 +247,27 @@ model GroupMember {
 // ==================== EVENTS ====================
 
 model Event {
-  id          String   @id @default(cuid())
-  creatorId   String
-  creator     User     @relation("EventCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  groupId     String?
+  id              String   @id @default(cuid())
+  creatorId       String
+  creator         User     @relation("EventCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  groupId         String?
   
-  title       String
-  description String?
-  posterUrl   String?
-  location    String
-  eventDate   DateTime
-  eventTime   String?
-  endDate     DateTime?
+  title           String
+  description     String?
+  posterUrl       String?
+  location        String
+  eventDate       DateTime
+  eventTime       String?
+  endDate         DateTime?
   
-  isPublic    Boolean @default(true)
-  capacity    Int?
-  attendeesCount Int @default(0)
+  isPublic        Boolean  @default(true)
+  capacity        Int?
+  attendeesCount  Int      @default(0)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  // Relations
-  rsvps       EventRsvp[]
+  rsvps           EventRsvp[]
 
   @@index([creatorId])
   @@index([eventDate])
@@ -334,11 +326,11 @@ model MarketplaceListing {
   location    String?
   contactInfo String?
   
-  status      ListingStatus @default(ACTIVE)
-  viewsCount  Int @default(0)
+  status      ListingStatus   @default(ACTIVE)
+  viewsCount  Int             @default(0)
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@index([sellerId])
   @@index([category])
@@ -369,10 +361,10 @@ model Notification {
   message     String
   data        String?
   
-  isRead      Boolean @default(false)
+  isRead      Boolean          @default(false)
   readAt      DateTime?
   
-  createdAt   DateTime @default(now())
+  createdAt   DateTime         @default(now())
 
   @@index([userId])
   @@index([isRead])
@@ -397,27 +389,27 @@ enum ReportReason {
 }
 
 model Report {
-  id          String       @id @default(cuid())
-  reporterId  String
-  reporter    User         @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  id              String       @id @default(cuid())
+  reporterId      String
+  reporter        User         @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
   
-  reportedUserId String?
-  reportedUser   User?      @relation("ReportReported", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reportedUserId  String?
+  reportedUser    User?        @relation("ReportReported", fields: [reportedUserId], references: [id], onDelete: Cascade)
   
-  postId      String?
-  post        Post?       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId          String?
+  post            Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
   
-  commentId   String?
+  commentId       String?
   
-  reason      ReportReason
-  description String?
-  status      ReportStatus @default(PENDING)
+  reason          ReportReason
+  description     String?
+  status          ReportStatus @default(PENDING)
   
-  reviewedBy  String?
-  reviewNotes String?
+  reviewedBy      String?
+  reviewNotes     String?
   
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   @@index([reporterId])
   @@index([reportedUserId])
